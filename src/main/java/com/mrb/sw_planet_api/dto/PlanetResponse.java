@@ -1,8 +1,6 @@
-package com.mrb.tests.dto;
+package com.mrb.sw_planet_api.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.hateoas.server.core.Relation;
 
 @Getter

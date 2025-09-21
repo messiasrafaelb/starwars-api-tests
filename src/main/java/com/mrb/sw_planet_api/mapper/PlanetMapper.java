@@ -1,9 +1,8 @@
-package com.mrb.tests.mapper;
+package com.mrb.sw_planet_api.mapper;
 
-import com.mrb.tests.dto.PlanetRequest;
-import com.mrb.tests.dto.PlanetResponse;
-import com.mrb.tests.model.Planet;
-import org.springframework.stereotype.Component;
+import com.mrb.sw_planet_api.dto.PlanetRequest;
+import com.mrb.sw_planet_api.dto.PlanetResponse;
+import com.mrb.sw_planet_api.model.Planet;
 
 import java.util.List;
 

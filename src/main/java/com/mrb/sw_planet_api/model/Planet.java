@@ -1,4 +1,4 @@
-package com.mrb.tests.model;
+package com.mrb.sw_planet_api.model;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;

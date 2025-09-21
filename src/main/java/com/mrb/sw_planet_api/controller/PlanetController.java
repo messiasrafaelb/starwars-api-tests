@@ -1,8 +1,8 @@
-package com.mrb.tests.controller;
+package com.mrb.sw_planet_api.controller;
 
-import com.mrb.tests.dto.PlanetRequest;
-import com.mrb.tests.dto.PlanetResponse;
-import com.mrb.tests.service.PlanetService;
+import com.mrb.sw_planet_api.dto.PlanetRequest;
+import com.mrb.sw_planet_api.dto.PlanetResponse;
+import com.mrb.sw_planet_api.service.PlanetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

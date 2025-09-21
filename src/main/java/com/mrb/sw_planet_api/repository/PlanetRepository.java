@@ -1,6 +1,6 @@
-package com.mrb.tests.repository;
+package com.mrb.sw_planet_api.repository;
 
-import com.mrb.tests.model.Planet;
+import com.mrb.sw_planet_api.model.Planet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

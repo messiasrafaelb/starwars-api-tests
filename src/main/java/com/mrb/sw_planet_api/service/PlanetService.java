@@ -1,9 +1,9 @@
-package com.mrb.tests.service;
+package com.mrb.sw_planet_api.service;
 
-import com.mrb.tests.dto.PlanetRequest;
-import com.mrb.tests.dto.PlanetResponse;
-import com.mrb.tests.mapper.PlanetMapper;
-import com.mrb.tests.repository.PlanetRepository;
+import com.mrb.sw_planet_api.dto.PlanetRequest;
+import com.mrb.sw_planet_api.dto.PlanetResponse;
+import com.mrb.sw_planet_api.mapper.PlanetMapper;
+import com.mrb.sw_planet_api.repository.PlanetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

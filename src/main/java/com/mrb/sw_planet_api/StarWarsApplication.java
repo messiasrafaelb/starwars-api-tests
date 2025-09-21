@@ -1,13 +1,13 @@
-package com.mrb.tests;
+package com.mrb.sw_planet_api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TestsApplication {
+public class StarWarsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TestsApplication.class, args);
+		SpringApplication.run(StarWarsApplication.class, args);
 	}
 
 }

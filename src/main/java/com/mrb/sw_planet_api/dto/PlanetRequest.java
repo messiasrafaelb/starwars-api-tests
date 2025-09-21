@@ -1,4 +1,4 @@
-package com.mrb.tests.dto;
+package com.mrb.sw_planet_api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

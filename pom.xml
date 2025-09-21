@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mrb</groupId>
-	<artifactId>tests</artifactId>
+	<artifactId>sw-planet-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>tests</name>
+	<name>sw-planet-api</name>
 	<description>Demo project for practice automatized tests</description>
 	<url/>
 	<licenses>
@@ -72,6 +72,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 
 <!--Test-->

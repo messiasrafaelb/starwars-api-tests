@@ -3,7 +3,6 @@ package com.mrb.sw_planet_api.mapper;
 import com.mrb.sw_planet_api.dto.PlanetRequest;
 import com.mrb.sw_planet_api.dto.PlanetResponse;
 import com.mrb.sw_planet_api.model.Planet;
-
 import java.util.List;
 
 public class PlanetMapper {

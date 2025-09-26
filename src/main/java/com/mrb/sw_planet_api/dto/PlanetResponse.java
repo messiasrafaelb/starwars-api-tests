@@ -6,6 +6,7 @@ import org.springframework.hateoas.server.core.Relation;
 @Getter
 @Builder
 @ToString
+@AllArgsConstructor
 @Relation(collectionRelation = "planets")
 public class PlanetResponse {
     private final Long id;

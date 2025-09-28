@@ -6,6 +6,7 @@ import com.mrb.sw_planet_api.exception.PlanetNotFoundException;
 import com.mrb.sw_planet_api.mapper.PlanetMapper;
 import com.mrb.sw_planet_api.model.Planet;
 import com.mrb.sw_planet_api.repository.PlanetRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,23 +25,31 @@ import static org.mockito.Mockito.*;
 
 // @SpringBootTest(classes = PlanetService.class)
 @ExtendWith(MockitoExtension.class)
-public class PlanetServiceTest {
+class PlanetServiceTest {
+    //    @MockBean
+    @Mock
+    private PlanetRepository planetRepository;
 
     //    @Autowired
     @InjectMocks
     private PlanetService planetService;
 
-    //    @MockBean
-    @Mock
-    private PlanetRepository planetRepository;
+    private Planet planet;
+    private PlanetRequest planetRequest;
+    private PlanetResponse planetResponse;
+
+    @BeforeEach
+    void setup() {
+        planet = new Planet(1L, "name", "climate", "terrain");
+        planetRequest = new PlanetRequest("name", "climate", "terrain");
+        planetResponse = PlanetMapper.toResponse(planet);
+    }
 
     // method name convention = operation_state_return
     @Test
     @DisplayName("create() should return a Planet with same data when given valid input")
     public void createPlanet_WithValidData_ReturnsPlanet() {
 //ARRANGE ______________________________________________________________________________________________________________
-        var planet = new Planet(1L, "name", "climate", "terrain");
-        var planetRequest = new PlanetRequest("name", "climate", "terrain");
         // Stub
         when(planetRepository.save(any(Planet.class))).thenReturn(planet);
 //ACT __________________________________________________________________________________________________________________
@@ -58,7 +68,6 @@ public class PlanetServiceTest {
     @Test
     @DisplayName("create() should return a RuntimeException with invalid data input")
     public void createPlanet_WithInvalidDate_ThrowsException() {
-        var planetRequest = new PlanetRequest("name", "climate", "terrain");
         when(planetRepository.save(any(Planet.class))).thenThrow(RuntimeException.class);
 
         assertThatThrownBy(() -> planetService.create(planetRequest))
@@ -71,15 +80,13 @@ public class PlanetServiceTest {
     @Test
     @DisplayName("findById() should return a Planet with valid ID")
     public void findById_WithValidId_ReturnsPlanet() {
-        Optional<Planet> planet = Optional.of(
-                new Planet(1L, "name", "climate", "terrain"));
-        when(planetRepository.findById(eq(1L))).thenReturn(planet);
+        when(planetRepository.findById(eq(1L))).thenReturn(Optional.of(planet));
 
         PlanetResponse sut = planetService.findById(1L);
 
         assertThat(sut)
                 .usingRecursiveComparison()
-                .isEqualTo(PlanetMapper.toResponse(planet.get()));
+                .isEqualTo(planetResponse);
 
         verify(planetRepository, times(1)).findById(1L);
     }
@@ -113,14 +120,11 @@ public class PlanetServiceTest {
     @Test
     @DisplayName("findByName() should return a Planet with valid name input")
     public void findByName_WithValidName_ReturnsPlanet() {
-        Optional<Planet> planet = Optional.of(
-                new Planet(1L, "name", "climate", "terrain"));
-        PlanetResponse expected = PlanetMapper.toResponse(planet.get());
-        when(planetRepository.findByNameContainingIgnoreCase(eq("name"))).thenReturn(planet);
+        when(planetRepository.findByNameContainingIgnoreCase(eq("name"))).thenReturn(Optional.of(planet));
 
-        PlanetResponse planetResponse = planetService.findByName("name");
+        var planetResponse = planetService.findByName("name");
 
-        assertThat(planetResponse).usingRecursiveComparison().isEqualTo(expected);
+        assertThat(planetResponse).usingRecursiveComparison().isEqualTo(planet);
 
         verify(planetRepository, times(1)).findByNameContainingIgnoreCase(eq("name"));
     }
@@ -142,20 +146,20 @@ public class PlanetServiceTest {
     @DisplayName("find() should return a page of Planet with valid data input")
     public void find_WithValidDataInput_ReturnsPlanets() {
         var planets = List.of(
-                new Planet(1L, "1", "1", "1"),
-                new Planet(2L, "2", "1", "1"),
-                new Planet(3L, "3", "3", "3"));
+                new Planet(1L, "Tatooine", "arid", "desert"),
+                new Planet(2L, "Hoth", "frozen", "tundra"));
         PageImpl<Planet> planetPage = new PageImpl<>(planets, Pageable.unpaged(), planets.size());
-        when(planetRepository.findAll(any(Pageable.class))).thenReturn(planetPage);
 
-        Page<PlanetResponse> sut = planetService.find(null, null, Pageable.unpaged());
+        when(planetRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(planetPage);
+
+        Page<PlanetResponse> sut = planetService.find("arid", "desert", Pageable.unpaged());
 
         assertThat(sut.getContent())
-                .hasSize(3)
-                .extracting("name")
-                .containsExactly("1", "2", "3");
+                .hasSize(2)
+                .extracting(PlanetResponse::getName)
+                .containsExactly("Tatooine", "Hoth");
 
-        verify(planetRepository, times(1)).findAll(any(Pageable.class));
+        verify(planetRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
@@ -177,7 +181,6 @@ public class PlanetServiceTest {
     @Test
     @DisplayName("delete() should return void with valid ID input")
     public void delete_WithValidID_ReturnsVoid() {
-        Planet planet = new Planet(1L, "name", "climate", "terrain");
         when(planetRepository.findById(1L)).thenReturn(Optional.of(planet));
         doNothing().when(planetRepository).delete(planet);
 
@@ -199,8 +202,4 @@ public class PlanetServiceTest {
         verify(planetRepository, times(1)).findById(99L);
         verify(planetRepository, never()).delete(any());
     }
-
-
-
-
 }

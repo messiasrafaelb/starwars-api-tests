@@ -1,11 +1,13 @@
 package com.mrb.sw_planet_api.service;
 
+import com.mrb.sw_planet_api.dto.PlanetPatchRequest;
 import com.mrb.sw_planet_api.dto.PlanetRequest;
 import com.mrb.sw_planet_api.dto.PlanetResponse;
 import com.mrb.sw_planet_api.exception.PlanetNotFoundException;
 import com.mrb.sw_planet_api.mapper.PlanetMapper;
 import com.mrb.sw_planet_api.model.Planet;
 import com.mrb.sw_planet_api.repository.PlanetRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,4 +58,24 @@ public class PlanetService {
         return Map.of("message", "Planet deleted successfully");
     }
 
+    @Transactional
+    public PlanetResponse patch(Long id, PlanetPatchRequest request) {
+        var planet = repository.findById(id)
+                .orElseThrow(() -> new PlanetNotFoundException(id));
+        if (hasText(request.name())) planet.setName(request.name());
+        if (hasText(request.climate())) planet.setClimate(request.climate());
+        if (hasText(request.terrain())) planet.setTerrain(request.terrain());
+        return PlanetMapper.toResponse(planet);
+    }
+//    @Transactional ensure active context JPA and avoid redundant queries
+
+    @Transactional
+    public PlanetResponse update(Long id, PlanetRequest request) {
+        var planet = repository.findById(id)
+                .orElseThrow(() -> new PlanetNotFoundException(id));
+        planet.setName(request.getName());
+        planet.setClimate(request.getClimate());
+        planet.setTerrain(request.getTerrain());
+        return PlanetMapper.toResponse(planet);
+    }
 }

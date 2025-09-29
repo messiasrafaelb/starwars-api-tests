@@ -1,5 +1,6 @@
 package com.mrb.sw_planet_api.service;
 
+import com.mrb.sw_planet_api.dto.PlanetPatchRequest;
 import com.mrb.sw_planet_api.dto.PlanetRequest;
 import com.mrb.sw_planet_api.dto.PlanetResponse;
 import com.mrb.sw_planet_api.exception.PlanetNotFoundException;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,12 +40,15 @@ class PlanetServiceTest {
     private Planet planet;
     private PlanetRequest planetRequest;
     private PlanetResponse planetResponse;
+    private PlanetPatchRequest planetPatchRequest;
+
 
     @BeforeEach
     void setup() {
         planet = new Planet(1L, "name", "climate", "terrain");
         planetRequest = new PlanetRequest("name", "climate", "terrain");
         planetResponse = PlanetMapper.toResponse(planet);
+        planetPatchRequest = new PlanetPatchRequest("Tatooine", "arid", "desert");
     }
 
     // method name convention = operation_state_return
@@ -51,7 +56,7 @@ class PlanetServiceTest {
     @DisplayName("create() should return a PlanetResponse with same data when given valid input")
     void createPlanet_WithValidData_ReturnsPlanetResponse() {
 //ARRANGE ______________________________________________________________________________________________________________
-        // Stub
+        // Stub = Test double, fake object that returns values expected
         when(planetRepository.save(any(Planet.class))).thenReturn(planet);
 //ACT __________________________________________________________________________________________________________________
         // sut = system under test, name convention for the class variable that we are testing.
@@ -61,7 +66,7 @@ class PlanetServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(planet);
-        // Spy
+        // Spy = Test double, verify method calls of a mock object
         verify(planetRepository).save(any(Planet.class));
         verifyNoMoreInteractions(planetRepository);
     }
@@ -150,7 +155,8 @@ class PlanetServiceTest {
                 new Planet(1L, "Tatooine", "arid", "desert"));
         PageImpl<Planet> planetPage = new PageImpl<>(planets, Pageable.unpaged(), planets.size());
 
-        when(planetRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(planetPage);
+        when(planetRepository.findAll(ArgumentMatchers.<Specification<Planet>>any(),
+                any(Pageable.class))).thenReturn(planetPage);
 
         Page<PlanetResponse> sut = planetService.find("arid", "desert", Pageable.unpaged());
 
@@ -159,7 +165,8 @@ class PlanetServiceTest {
                 .extracting(PlanetResponse::getName)
                 .containsExactly("Tatooine");
 
-        verify(planetRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+        verify(planetRepository, times(1))
+                .findAll(ArgumentMatchers.<Specification<Planet>>any(), any(Pageable.class));
     }
 
     @Test
@@ -195,7 +202,7 @@ class PlanetServiceTest {
     @Test
     @DisplayName("delete() should return a PlanetNotFoundException with invalid ID input")
     void delete_WithIdNotFound_ReturnsPlanetNotFoundException() {
-        when(planetRepository.findById(any())).thenReturn(Optional.empty());
+        when(planetRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> planetService.delete(99L))
                 .isInstanceOf(PlanetNotFoundException.class)
@@ -203,5 +210,75 @@ class PlanetServiceTest {
 
         verify(planetRepository, times(1)).findById(99L);
         verify(planetRepository, never()).delete(any(Planet.class));
+    }
+
+    //______________________________________________________________________________________________________________________
+    @Test
+    @DisplayName("patch() should return a PlanetResponse patched")
+    void patch_WithValidDataInput_ReturnsPlanetResponse() {
+        when(planetRepository.findById(anyLong())).thenReturn(Optional.of(planet));
+
+        PlanetResponse response = planetService.patch(1L, planetPatchRequest);
+
+//      This way of comparing fields gets the exact value between two objects
+        assertThat(response).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(planetPatchRequest);
+
+//      This way of comparing is good for explicit readability
+//        assertThat(response.getName()).isEqualTo(pathRequest.name());
+//        assertThat(response.getClimate()).isEqualTo(pathRequest.climate());
+//        assertThat(response.getTerrain()).isEqualTo(pathRequest.terrain());
+
+
+//      This way of comparing is like the one above, but chained
+//        assertThat(response)
+//                .extracting(PlanetResponse::getName, PlanetResponse::getClimate, PlanetResponse::getTerrain)
+//                .containsExactly(pathRequest.name(), pathRequest.climate(), pathRequest.terrain());
+
+        verify(planetRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(planetRepository);
+    }
+
+    @Test
+    @DisplayName("patch() should return a PlanetNotFoundException when ID is invalid")
+    void patch_WithInvalidId_ReturnPlanetNotFoundException() {
+        when(planetRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> planetService.patch(99L, planetPatchRequest))
+                .isInstanceOf(PlanetNotFoundException.class)
+                .hasMessageContaining("Planet not found with id " + 99L);
+
+        verify(planetRepository, times(1)).findById(99L);
+        verifyNoMoreInteractions(planetRepository);
+    }
+
+    @Test
+    @DisplayName("update() should return a PlanetResponse")
+    void update_WithValidDataInput_ReturnsPlanetResponse() {
+        when(planetRepository.findById(anyLong())).thenReturn(Optional.of(planet));
+
+        planetRequest.setName("Hoth");
+        PlanetResponse response = planetService.update(1L, planetRequest);
+
+        assertThat(response).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(planetRequest);
+
+        verify(planetRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(planetRepository);
+    }
+
+    @Test
+    @DisplayName("update() should return a PlanetNotFoundException when ID is invalid")
+    void update_WithInvalidId_ReturnPlanetNotFoundException() {
+        when(planetRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> planetService.update(99L, planetRequest))
+                .isInstanceOf(PlanetNotFoundException.class)
+                .hasMessageContaining("Planet not found with id " + 99L);
+
+        verify(planetRepository, times(1)).findById(99L);
+        verifyNoMoreInteractions(planetRepository);
     }
 }

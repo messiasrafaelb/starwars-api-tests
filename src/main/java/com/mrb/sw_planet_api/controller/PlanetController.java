@@ -48,16 +48,16 @@ public class PlanetController {
         return ResponseEntity.status(OK).body(planet);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("name/{name}")
     public ResponseEntity<PlanetResponse> findPlanetByName(@PathVariable @NotBlank String name) {
         var planet = service.findByName(name);
         return ResponseEntity.status(OK).body(planet);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Page<PlanetResponse>> findPlanets(
             @PageableDefault(page = 0, size = 15, sort = "title", direction = ASC) Pageable pageable,
-            String climate, String terrain) {
+            @RequestParam(required = false) String climate, @RequestParam(required = false) String terrain) {
         var planets = service.find(climate, terrain, pageable);
         return ResponseEntity.status(OK).body(planets);
     }

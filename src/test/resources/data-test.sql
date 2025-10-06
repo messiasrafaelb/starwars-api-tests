@@ -1,0 +1,10 @@
+INSERT INTO planets (name, climate, terrain) VALUES ('Tatooine', 'arid', 'desert');
+INSERT INTO planets (name, climate, terrain) VALUES ('Hoth', 'frozen', 'ice');
+INSERT INTO planets (name, climate, terrain) VALUES ('Dagobah', 'murky', 'swamp');
+INSERT INTO planets (name, climate, terrain) VALUES ('Endor', 'temperate', 'forest');
+INSERT INTO planets (name, climate, terrain) VALUES ('Bespin', 'temperate', 'gas giant');
+INSERT INTO planets (name, climate, terrain) VALUES ('Naboo', 'temperate', 'plains');
+INSERT INTO planets (name, climate, terrain) VALUES ('Coruscant', 'temperate', 'cityscape');
+INSERT INTO planets (name, climate, terrain) VALUES ('Mustafar', 'hot', 'volcano');
+INSERT INTO planets (name, climate, terrain) VALUES ('Kamino', 'temperate', 'ocean');
+INSERT INTO planets (name, climate, terrain) VALUES ('Geonosis', 'arid', 'rocky');

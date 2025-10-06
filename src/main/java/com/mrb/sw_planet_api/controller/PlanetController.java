@@ -56,7 +56,7 @@ public class PlanetController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<PlanetResponse>> findPlanets(
-            @PageableDefault(page = 0, size = 15, sort = "title", direction = ASC) Pageable pageable,
+            @PageableDefault(page = 0, size = 15, sort = "name", direction = ASC) Pageable pageable,
             @RequestParam(required = false) String climate, @RequestParam(required = false) String terrain) {
         var planets = service.find(climate, terrain, pageable);
         return ResponseEntity.status(OK).body(planets);
